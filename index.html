@@ -1,50 +1,51 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>25 Second Alarm</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>25 Second Beep Clock</title>
 
   <style>
     body {
       margin: 0;
       height: 100vh;
+      background: #0f172a;
       display: flex;
       justify-content: center;
       align-items: center;
-      background: #111827;
       font-family: Arial, sans-serif;
       color: white;
     }
 
-    .container {
+    .clock-box {
       text-align: center;
-      background: #1f2937;
+      background: #1e293b;
       padding: 40px;
-      border-radius: 16px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.4);
+      border-radius: 20px;
       width: 320px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.5);
     }
 
-    h1 {
-      margin-bottom: 10px;
-    }
-
-    .timer {
-      font-size: 48px;
-      margin: 20px 0;
+    .time {
+      font-size: 52px;
       font-weight: bold;
+      margin-bottom: 20px;
       color: #22c55e;
     }
 
+    .counter {
+      font-size: 28px;
+      margin-bottom: 25px;
+      color: #facc15;
+    }
+
     button {
-      padding: 12px 24px;
+      padding: 12px 22px;
       border: none;
       border-radius: 10px;
-      cursor: pointer;
       font-size: 16px;
-      margin: 8px;
-      transition: 0.2s;
+      cursor: pointer;
+      margin: 5px;
     }
 
     .start {
@@ -57,117 +58,110 @@
       color: white;
     }
 
-    button:hover {
-      transform: scale(1.05);
-    }
-
     .status {
       margin-top: 15px;
-      color: #9ca3af;
+      color: #cbd5e1;
     }
   </style>
 </head>
 <body>
 
-  <div class="container">
-    <h1>25 Sec Alarm</h1>
+  <div class="clock-box">
+    <div class="time" id="clock">00:00:00</div>
 
-    <div class="timer" id="timer">25</div>
+    <div class="counter">
+      Next beep in <span id="remaining">25</span>s
+    </div>
 
-    <button class="start" onclick="startAlarm()">Start</button>
-    <button class="stop" onclick="stopAlarm()">Stop</button>
+    <button class="start" onclick="startBeeping()">Start</button>
+    <button class="stop" onclick="stopBeeping()">Stop</button>
 
     <div class="status" id="status">Stopped</div>
   </div>
 
-<script>
-  let countdown = 25;
-  let interval = null;
+  <script>
+    const clockEl = document.getElementById("clock");
+    const remainingEl = document.getElementById("remaining");
+    const statusEl = document.getElementById("status");
 
-  const timerEl = document.getElementById("timer");
-  const statusEl = document.getElementById("status");
+    let running = false;
+    let startTime = null;
+    let interval = null;
 
-  function updateDisplay() {
-    timerEl.innerText = countdown;
-  }
+    // LIVE CLOCK
+    function updateClock() {
+      const now = new Date();
 
-  function beep3Times() {
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const h = String(now.getHours()).padStart(2, '0');
+      const m = String(now.getMinutes()).padStart(2, '0');
+      const s = String(now.getSeconds()).padStart(2, '0');
 
-    let count = 0;
+      clockEl.innerText = `${h}:${m}:${s}`;
+    }
 
-    function singleBeep() {
-      const oscillator = audioCtx.createOscillator();
-      const gainNode = audioCtx.createGain();
+    setInterval(updateClock, 1000);
+    updateClock();
 
-      oscillator.type = "sine";
-      oscillator.frequency.value = 900;
+    // BEEP FUNCTION
+    function beep3Times() {
+      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-      oscillator.connect(gainNode);
-      gainNode.connect(audioCtx.destination);
+      for (let i = 0; i < 3; i++) {
+        const oscillator = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
 
-      gainNode.gain.value = 0.2;
+        oscillator.type = "square";
+        oscillator.frequency.value = 850;
 
-      oscillator.start();
-      oscillator.stop(audioCtx.currentTime + 0.2);
+        oscillator.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
 
-      count++;
+        const start = audioCtx.currentTime + (i * 0.35);
 
-      if (count < 3) {
-        setTimeout(singleBeep, 300);
+        gainNode.gain.setValueAtTime(0.2, start);
+
+        oscillator.start(start);
+        oscillator.stop(start + 0.18);
       }
     }
 
-    singleBeep();
-  }
+    function startBeeping() {
+      if (running) return;
 
-  function showNotification() {
-    if (Notification.permission === "granted") {
-      new Notification("⏰ Alarm!", {
-        body: "25 seconds completed!"
-      });
+      running = true;
+      statusEl.innerText = "Running...";
+
+      startTime = Date.now();
+
+      interval = setInterval(() => {
+
+        const elapsed = Math.floor((Date.now() - startTime) / 1000);
+
+        const remaining = 25 - (elapsed % 25);
+
+        remainingEl.innerText = remaining;
+
+        // EXACTLY every 25 sec
+        if (elapsed > 0 && elapsed % 25 === 0) {
+          beep3Times();
+
+          // prevent multiple triggers same second
+          startTime = Date.now();
+        }
+
+      }, 250);
     }
-  }
 
-  async function startAlarm() {
-    if (interval) return;
+    function stopBeeping() {
+      running = false;
 
-    if (Notification.permission !== "granted") {
-      await Notification.requestPermission();
+      clearInterval(interval);
+
+      remainingEl.innerText = "25";
+
+      statusEl.innerText = "Stopped";
     }
-
-    statusEl.innerText = "Running...";
-    countdown = 25;
-    updateDisplay();
-
-    interval = setInterval(() => {
-
-      countdown--;
-
-      if (countdown <= 0) {
-        beep3Times();
-        showNotification();
-
-        countdown = 25;
-      }
-
-      updateDisplay();
-
-    }, 1000);
-  }
-
-  function stopAlarm() {
-    clearInterval(interval);
-    interval = null;
-
-    countdown = 25;
-    updateDisplay();
-
-    statusEl.innerText = "Stopped";
-  }
-
-  updateDisplay();
-</script>
+  </script>
 
 </body>
 </html>
