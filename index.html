@@ -1,3 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>25 Second Alarm</title>
+
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #111827;
+      font-family: Arial, sans-serif;
+      color: white;
+    }
+
+    .container {
+      text-align: center;
+      background: #1f2937;
+      padding: 40px;
+      border-radius: 16px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.4);
+      width: 320px;
+    }
+
+    h1 {
+      margin-bottom: 10px;
+    }
+
+    .timer {
+      font-size: 48px;
+      margin: 20px 0;
+      font-weight: bold;
+      color: #22c55e;
+    }
+
+    button {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 16px;
+      margin: 8px;
+      transition: 0.2s;
+    }
+
+    .start {
+      background: #22c55e;
+      color: white;
+    }
+
+    .stop {
+      background: #ef4444;
+      color: white;
+    }
+
+    button:hover {
+      transform: scale(1.05);
+    }
+
+    .status {
+      margin-top: 15px;
+      color: #9ca3af;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>25 Sec Alarm</h1>
+
+    <div class="timer" id="timer">25</div>
+
+    <button class="start" onclick="startAlarm()">Start</button>
+    <button class="stop" onclick="stopAlarm()">Stop</button>
+
+    <div class="status" id="status">Stopped</div>
+  </div>
+
 <script>
   let countdown = 25;
   let interval = null;
@@ -86,3 +168,6 @@
 
   updateDisplay();
 </script>
+
+</body>
+</html>
