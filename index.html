@@ -1,11 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>25 Second Beep Clock</title>
 
   <style>
+    *{
+      box-sizing:border-box;
+    }
+
     body {
       margin: 0;
       height: 100vh;
@@ -15,15 +19,17 @@
       align-items: center;
       font-family: Arial, sans-serif;
       color: white;
+      padding: 15px;
     }
 
     .clock-box {
       text-align: center;
       background: #1e293b;
-      padding: 40px;
+      padding: 35px 25px;
       border-radius: 20px;
-      width: 320px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.5);
+      width: 100%;
+      max-width: 340px;
+      box-shadow: 0 0 25px rgba(0,0,0,0.45);
     }
 
     .time {
@@ -31,6 +37,7 @@
       font-weight: bold;
       margin-bottom: 20px;
       color: #22c55e;
+      letter-spacing: 2px;
     }
 
     .counter {
@@ -46,6 +53,12 @@
       font-size: 16px;
       cursor: pointer;
       margin: 5px;
+      font-weight: bold;
+      transition: 0.2s;
+    }
+
+    button:active{
+      transform: scale(0.96);
     }
 
     .start {
@@ -59,14 +72,22 @@
     }
 
     .status {
-      margin-top: 15px;
+      margin-top: 18px;
       color: #cbd5e1;
+      font-size: 16px;
+    }
+
+    .note{
+      margin-top:10px;
+      font-size:13px;
+      color:#94a3b8;
     }
   </style>
 </head>
 <body>
 
   <div class="clock-box">
+
     <div class="time" id="clock">00:00:00</div>
 
     <div class="counter">
@@ -74,22 +95,33 @@
     </div>
 
     <button class="start" onclick="startBeeping()">Start</button>
+
     <button class="stop" onclick="stopBeeping()">Stop</button>
 
     <div class="status" id="status">Stopped</div>
+
+    <div class="note">
+      Works better on mobile Chrome now
+    </div>
+
   </div>
 
   <script>
+
     const clockEl = document.getElementById("clock");
     const remainingEl = document.getElementById("remaining");
     const statusEl = document.getElementById("status");
 
     let running = false;
-    let startTime = null;
     let interval = null;
+    let nextBeep = null;
+
+    // SINGLE AUDIO CONTEXT
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
     // LIVE CLOCK
     function updateClock() {
+
       const now = new Date();
 
       const h = String(now.getHours()).padStart(2, '0');
@@ -102,11 +134,16 @@
     setInterval(updateClock, 1000);
     updateClock();
 
-    // BEEP FUNCTION
+    // 3 BEEPS
     function beep3Times() {
-      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+      // resume audio on mobile if suspended
+      if (audioCtx.state === "suspended") {
+        audioCtx.resume();
+      }
 
       for (let i = 0; i < 3; i++) {
+
         const oscillator = audioCtx.createOscillator();
         const gainNode = audioCtx.createGain();
 
@@ -125,34 +162,42 @@
       }
     }
 
+    // START
     function startBeeping() {
+
       if (running) return;
 
       running = true;
+
       statusEl.innerText = "Running...";
 
-      startTime = Date.now();
+      nextBeep = Date.now() + 25000;
 
       interval = setInterval(() => {
 
-        const elapsed = Math.floor((Date.now() - startTime) / 1000);
+        const diff = nextBeep - Date.now();
 
-        const remaining = 25 - (elapsed % 25);
+        const remaining = Math.max(
+          0,
+          Math.ceil(diff / 1000)
+        );
 
         remainingEl.innerText = remaining;
 
-        // EXACTLY every 25 sec
-        if (elapsed > 0 && elapsed % 25 === 0) {
+        // beep exactly every 25 sec
+        if (diff <= 0) {
+
           beep3Times();
 
-          // prevent multiple triggers same second
-          startTime = Date.now();
+          nextBeep += 25000;
         }
 
-      }, 250);
+      }, 200);
     }
 
+    // STOP
     function stopBeeping() {
+
       running = false;
 
       clearInterval(interval);
@@ -161,6 +206,16 @@
 
       statusEl.innerText = "Stopped";
     }
+
+    // KEEP AUDIO ACTIVE ON MOBILE
+    document.addEventListener("click", () => {
+
+      if (audioCtx.state === "suspended") {
+        audioCtx.resume();
+      }
+
+    });
+
   </script>
 
 </body>
