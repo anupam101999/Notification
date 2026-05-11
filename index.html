@@ -1,155 +1,88 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>25 Second Alarm</title>
+<script>
+  let countdown = 25;
+  let interval = null;
 
-  <style>
-    body {
-      margin: 0;
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background: #111827;
-      font-family: Arial, sans-serif;
-      color: white;
-    }
+  const timerEl = document.getElementById("timer");
+  const statusEl = document.getElementById("status");
 
-    .container {
-      text-align: center;
-      background: #1f2937;
-      padding: 40px;
-      border-radius: 16px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.4);
-      width: 320px;
-    }
+  function updateDisplay() {
+    timerEl.innerText = countdown;
+  }
 
-    h1 {
-      margin-bottom: 10px;
-    }
+  function beep3Times() {
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-    .timer {
-      font-size: 48px;
-      margin: 20px 0;
-      font-weight: bold;
-      color: #22c55e;
-    }
+    let count = 0;
 
-    button {
-      padding: 12px 24px;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      font-size: 16px;
-      margin: 8px;
-      transition: 0.2s;
-    }
+    function singleBeep() {
+      const oscillator = audioCtx.createOscillator();
+      const gainNode = audioCtx.createGain();
 
-    .start {
-      background: #22c55e;
-      color: white;
-    }
+      oscillator.type = "sine";
+      oscillator.frequency.value = 900;
 
-    .stop {
-      background: #ef4444;
-      color: white;
-    }
+      oscillator.connect(gainNode);
+      gainNode.connect(audioCtx.destination);
 
-    button:hover {
-      transform: scale(1.05);
-    }
+      gainNode.gain.value = 0.2;
 
-    .status {
-      margin-top: 15px;
-      color: #9ca3af;
-    }
-  </style>
-</head>
-<body>
+      oscillator.start();
+      oscillator.stop(audioCtx.currentTime + 0.2);
 
-  <div class="container">
-    <h1>25 Sec Alarm</h1>
+      count++;
 
-    <div class="timer" id="timer">25</div>
-
-    <button class="start" onclick="startAlarm()">Start</button>
-    <button class="stop" onclick="stopAlarm()">Stop</button>
-
-    <div class="status" id="status">Stopped</div>
-  </div>
-
-  <script>
-    let countdown = 25;
-    let interval = null;
-
-    const timerEl = document.getElementById("timer");
-    const statusEl = document.getElementById("status");
-
-    function beep() {
-      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-
-      for (let i = 0; i < 3; i++) {
-        const oscillator = audioCtx.createOscillator();
-        const gainNode = audioCtx.createGain();
-
-        oscillator.type = "sine";
-        oscillator.frequency.value = 800;
-
-        oscillator.connect(gainNode);
-        gainNode.connect(audioCtx.destination);
-
-        const startTime = audioCtx.currentTime + (i * 0.4);
-
-        gainNode.gain.setValueAtTime(0.2, startTime);
-
-        oscillator.start(startTime);
-        oscillator.stop(startTime + 0.2);
+      if (count < 3) {
+        setTimeout(singleBeep, 300);
       }
     }
 
-    function showNotification() {
-      if (Notification.permission === "granted") {
-        new Notification("⏰ Alarm!", {
-          body: "25 seconds completed!"
-        });
+    singleBeep();
+  }
+
+  function showNotification() {
+    if (Notification.permission === "granted") {
+      new Notification("⏰ Alarm!", {
+        body: "25 seconds completed!"
+      });
+    }
+  }
+
+  async function startAlarm() {
+    if (interval) return;
+
+    if (Notification.permission !== "granted") {
+      await Notification.requestPermission();
+    }
+
+    statusEl.innerText = "Running...";
+    countdown = 25;
+    updateDisplay();
+
+    interval = setInterval(() => {
+
+      countdown--;
+
+      if (countdown <= 0) {
+        beep3Times();
+        showNotification();
+
+        countdown = 25;
       }
-    }
 
-    async function startAlarm() {
-      if (interval) return;
+      updateDisplay();
 
-      if (Notification.permission !== "granted") {
-        await Notification.requestPermission();
-      }
+    }, 1000);
+  }
 
-      statusEl.innerText = "Running...";
+  function stopAlarm() {
+    clearInterval(interval);
+    interval = null;
 
-      interval = setInterval(() => {
-        countdown--;
-        timerEl.innerText = countdown;
+    countdown = 25;
+    updateDisplay();
 
-        if (countdown <= 0) {
-          beep();
-          showNotification();
+    statusEl.innerText = "Stopped";
+  }
 
-          countdown = 25;
-          timerEl.innerText = countdown;
-        }
-      }, 1000);
-    }
-
-    function stopAlarm() {
-      clearInterval(interval);
-      interval = null;
-
-      countdown = 25;
-      timerEl.innerText = countdown;
-
-      statusEl.innerText = "Stopped";
-    }
-  </script>
-
-</body>
-</html>
+  updateDisplay();
+</script>
