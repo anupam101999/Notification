@@ -1,9 +1,11 @@
+Here is the full copy-paste code changed to 57 seconds, with the same IST / EST toggle:
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>28 Second Beep Clock</title>
+  <title>57 Second Beep Clock</title>
 
   <style>
     * {
@@ -231,12 +233,12 @@
   <main class="app">
     <section class="card">
 
-      <div class="badge">28 Second Beep Timer</div>
+      <div class="badge">57 Second Beep Timer</div>
 
       <div class="title">Beep Clock</div>
 
       <div class="subtitle">
-        Press start and the alarm will beep 3 times every 28 seconds.
+        Press start and the alarm will beep 3 times every 57 seconds.
       </div>
 
       <div class="timezone-row">
@@ -252,7 +254,7 @@
       <div class="timer-box">
         <div class="timer-label">Next beep in</div>
         <div class="remaining">
-          <span id="remaining">28</span>
+          <span id="remaining">57</span>
         </div>
         <div class="seconds">seconds</div>
       </div>
@@ -282,6 +284,9 @@
     const statusDot = document.getElementById("statusDot");
     const timezoneLabel = document.getElementById("timezoneLabel");
     const toggleBtn = document.getElementById("toggleBtn");
+
+    const BEEP_INTERVAL_SECONDS = 57;
+    const BEEP_INTERVAL_MS = BEEP_INTERVAL_SECONDS * 1000;
 
     let running = false;
     let interval = null;
@@ -376,7 +381,7 @@
       statusEl.innerText = "Running";
       statusDot.classList.add("running");
 
-      nextBeep = Date.now() + 28000;
+      nextBeep = Date.now() + BEEP_INTERVAL_MS;
 
       interval = setInterval(() => {
         const diff = nextBeep - Date.now();
@@ -387,7 +392,7 @@
 
         if (diff <= 0) {
           beep3Times();
-          nextBeep += 28000;
+          nextBeep += BEEP_INTERVAL_MS;
         }
       }, 200);
     }
@@ -397,7 +402,7 @@
 
       clearInterval(interval);
 
-      remainingEl.innerText = "28";
+      remainingEl.innerText = BEEP_INTERVAL_SECONDS;
 
       statusEl.innerText = "Stopped";
       statusDot.classList.remove("running");
