@@ -1,3 +1,5 @@
+Use this full copy-paste code. It shows IST by default, and when you click the toggle button, it changes the clock to EST. The 28-second beep timer remains same.
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -24,11 +26,11 @@
 
     .app {
       width: 100%;
-      max-width: 420px;
+      max-width: 430px;
     }
 
     .card {
-      background: rgba(15, 23, 42, 0.85);
+      background: rgba(15, 23, 42, 0.88);
       border: 1px solid rgba(148, 163, 184, 0.18);
       border-radius: 28px;
       padding: 30px;
@@ -50,8 +52,8 @@
     }
 
     .title {
-      font-size: 24px;
-      font-weight: 700;
+      font-size: 25px;
+      font-weight: 800;
       margin-bottom: 8px;
       color: #f8fafc;
     }
@@ -59,8 +61,39 @@
     .subtitle {
       font-size: 14px;
       color: #94a3b8;
-      margin-bottom: 30px;
+      margin-bottom: 26px;
       line-height: 1.5;
+    }
+
+    .timezone-row {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .timezone-label {
+      font-size: 14px;
+      color: #cbd5e1;
+      font-weight: 600;
+    }
+
+    .toggle-btn {
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: rgba(59, 130, 246, 0.15);
+      border: 1px solid rgba(96, 165, 250, 0.35);
+      color: #bfdbfe;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    .toggle-btn:hover {
+      background: rgba(59, 130, 246, 0.25);
+      transform: translateY(-1px);
     }
 
     .time {
@@ -68,8 +101,14 @@
       font-weight: 800;
       color: #ffffff;
       letter-spacing: 2px;
-      margin-bottom: 25px;
+      margin-bottom: 8px;
       text-shadow: 0 0 20px rgba(34, 197, 94, 0.25);
+    }
+
+    .date-text {
+      font-size: 14px;
+      color: #94a3b8;
+      margin-bottom: 25px;
     }
 
     .timer-box {
@@ -175,7 +214,7 @@
       }
 
       .time {
-        font-size: 46px;
+        font-size: 45px;
       }
 
       .remaining {
@@ -202,7 +241,15 @@
         Press start and the alarm will beep 3 times every 28 seconds.
       </div>
 
+      <div class="timezone-row">
+        <span class="timezone-label" id="timezoneLabel">IST Time</span>
+        <button class="toggle-btn" onclick="toggleTimezone()" id="toggleBtn">
+          Switch to EST
+        </button>
+      </div>
+
       <div class="time" id="clock">00:00:00</div>
+      <div class="date-text" id="dateText">Loading date...</div>
 
       <div class="timer-box">
         <div class="timer-label">Next beep in</div>
@@ -231,24 +278,64 @@
 
   <script>
     const clockEl = document.getElementById("clock");
+    const dateTextEl = document.getElementById("dateText");
     const remainingEl = document.getElementById("remaining");
     const statusEl = document.getElementById("status");
     const statusDot = document.getElementById("statusDot");
+    const timezoneLabel = document.getElementById("timezoneLabel");
+    const toggleBtn = document.getElementById("toggleBtn");
 
     let running = false;
     let interval = null;
     let nextBeep = null;
 
+    let currentTimezone = "IST";
+
+    const timezones = {
+      IST: {
+        label: "IST Time",
+        buttonText: "Switch to EST",
+        zone: "Asia/Kolkata"
+      },
+      EST: {
+        label: "EST Time",
+        buttonText: "Switch to IST",
+        zone: "America/New_York"
+      }
+    };
+
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
     function updateClock() {
+      const selected = timezones[currentTimezone];
+
       const now = new Date();
 
-      const h = String(now.getHours()).padStart(2, "0");
-      const m = String(now.getMinutes()).padStart(2, "0");
-      const s = String(now.getSeconds()).padStart(2, "0");
+      const time = new Intl.DateTimeFormat("en-US", {
+        timeZone: selected.zone,
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: false
+      }).format(now);
 
-      clockEl.innerText = `${h}:${m}:${s}`;
+      const date = new Intl.DateTimeFormat("en-US", {
+        timeZone: selected.zone,
+        weekday: "short",
+        day: "2-digit",
+        month: "short",
+        year: "numeric"
+      }).format(now);
+
+      clockEl.innerText = time;
+      dateTextEl.innerText = date;
+      timezoneLabel.innerText = selected.label;
+      toggleBtn.innerText = selected.buttonText;
+    }
+
+    function toggleTimezone() {
+      currentTimezone = currentTimezone === "IST" ? "EST" : "IST";
+      updateClock();
     }
 
     setInterval(updateClock, 1000);
