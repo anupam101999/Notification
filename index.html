@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>57 Second Beep Clock</title>
+  <title>Custom Beep Clock</title>
 
   <style>
     * {
@@ -24,14 +24,14 @@
 
     .app {
       width: 100%;
-      max-width: 430px;
+      max-width: 460px;
     }
 
     .card {
-      background: rgba(15, 23, 42, 0.88);
+      background: rgba(15, 23, 42, 0.9);
       border: 1px solid rgba(148, 163, 184, 0.18);
       border-radius: 28px;
-      padding: 30px;
+      padding: 28px;
       box-shadow: 0 25px 60px rgba(0, 0, 0, 0.45);
       backdrop-filter: blur(16px);
       text-align: center;
@@ -44,13 +44,13 @@
       background: rgba(34, 197, 94, 0.12);
       color: #86efac;
       font-size: 13px;
-      font-weight: 600;
-      margin-bottom: 22px;
+      font-weight: 700;
+      margin-bottom: 18px;
       letter-spacing: 0.3px;
     }
 
     .title {
-      font-size: 25px;
+      font-size: 26px;
       font-weight: 800;
       margin-bottom: 8px;
       color: #f8fafc;
@@ -59,7 +59,7 @@
     .subtitle {
       font-size: 14px;
       color: #94a3b8;
-      margin-bottom: 26px;
+      margin-bottom: 22px;
       line-height: 1.5;
     }
 
@@ -74,7 +74,7 @@
     .timezone-label {
       font-size: 14px;
       color: #cbd5e1;
-      font-weight: 600;
+      font-weight: 700;
     }
 
     .toggle-btn {
@@ -89,13 +89,8 @@
       transition: 0.2s ease;
     }
 
-    .toggle-btn:hover {
-      background: rgba(59, 130, 246, 0.25);
-      transform: translateY(-1px);
-    }
-
     .time {
-      font-size: 56px;
+      font-size: 54px;
       font-weight: 800;
       color: #ffffff;
       letter-spacing: 2px;
@@ -106,14 +101,14 @@
     .date-text {
       font-size: 14px;
       color: #94a3b8;
-      margin-bottom: 25px;
+      margin-bottom: 22px;
     }
 
     .timer-box {
       background: rgba(30, 41, 59, 0.9);
       border-radius: 22px;
       padding: 22px 18px;
-      margin-bottom: 26px;
+      margin-bottom: 22px;
       border: 1px solid rgba(148, 163, 184, 0.12);
     }
 
@@ -136,11 +131,77 @@
       margin-top: 6px;
     }
 
+    .settings {
+      background: rgba(2, 6, 23, 0.45);
+      border: 1px solid rgba(148, 163, 184, 0.12);
+      border-radius: 20px;
+      padding: 18px;
+      margin-bottom: 22px;
+      text-align: left;
+    }
+
+    .settings-title {
+      font-size: 15px;
+      font-weight: 800;
+      color: #e2e8f0;
+      margin-bottom: 14px;
+      text-align: center;
+    }
+
+    .field {
+      margin-bottom: 14px;
+    }
+
+    .field:last-child {
+      margin-bottom: 0;
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      color: #cbd5e1;
+      margin-bottom: 7px;
+      font-weight: 700;
+    }
+
+    input,
+    select {
+      width: 100%;
+      padding: 12px 13px;
+      border-radius: 12px;
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      background: rgba(15, 23, 42, 0.9);
+      color: #ffffff;
+      font-size: 15px;
+      outline: none;
+    }
+
+    input:focus,
+    select:focus {
+      border-color: #38bdf8;
+      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.12);
+    }
+
+    .quick-buttons {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .quick-buttons button {
+      padding: 8px;
+      font-size: 13px;
+      border-radius: 10px;
+      background: rgba(59, 130, 246, 0.15);
+      color: #bfdbfe;
+      border: 1px solid rgba(96, 165, 250, 0.25);
+    }
+
     .buttons {
       display: flex;
       gap: 12px;
       justify-content: center;
-      margin-bottom: 20px;
+      margin-bottom: 16px;
     }
 
     button {
@@ -150,7 +211,7 @@
       border-radius: 14px;
       font-size: 16px;
       cursor: pointer;
-      font-weight: 700;
+      font-weight: 800;
       transition: 0.2s ease;
     }
 
@@ -173,6 +234,14 @@
       background: linear-gradient(135deg, #ef4444, #dc2626);
       color: white;
       box-shadow: 0 10px 22px rgba(239, 68, 68, 0.22);
+    }
+
+    .test {
+      width: 100%;
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      color: white;
+      margin-bottom: 16px;
+      box-shadow: 0 10px 22px rgba(59, 130, 246, 0.22);
     }
 
     .status-row {
@@ -199,7 +268,7 @@
     }
 
     .note {
-      margin-top: 18px;
+      margin-top: 16px;
       font-size: 13px;
       color: #64748b;
       line-height: 1.5;
@@ -207,16 +276,15 @@
 
     @media (max-width: 420px) {
       .card {
-        padding: 26px 22px;
-        border-radius: 24px;
+        padding: 24px 20px;
       }
 
       .time {
-        font-size: 45px;
+        font-size: 43px;
       }
 
       .remaining {
-        font-size: 42px;
+        font-size: 40px;
       }
 
       .buttons {
@@ -231,12 +299,12 @@
   <main class="app">
     <section class="card">
 
-      <div class="badge">57 Second Beep Timer</div>
+      <div class="badge">Custom Beep Timer</div>
 
       <div class="title">Beep Clock</div>
 
       <div class="subtitle">
-        Press start and the alarm will beep 3 times every 57 seconds.
+        Set your own timer, ringtone type, and beep count.
       </div>
 
       <div class="timezone-row">
@@ -257,6 +325,54 @@
         <div class="seconds">seconds</div>
       </div>
 
+      <div class="settings">
+        <div class="settings-title">Timer Settings</div>
+
+        <div class="field">
+          <label for="intervalInput">Beep interval in seconds</label>
+          <input
+            type="number"
+            id="intervalInput"
+            min="1"
+            max="3600"
+            value="57"
+            onchange="applySettings()"
+            onkeyup="applySettings()"
+          />
+
+          <div class="quick-buttons">
+            <button onclick="setIntervalValue(25)">25 sec</button>
+            <button onclick="setIntervalValue(28)">28 sec</button>
+            <button onclick="setIntervalValue(57)">57 sec</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="beepCountInput">How many times to beep</label>
+          <input
+            type="number"
+            id="beepCountInput"
+            min="1"
+            max="20"
+            value="3"
+            onchange="applySettings()"
+            onkeyup="applySettings()"
+          />
+        </div>
+
+        <div class="field">
+          <label for="ringtoneSelect">Ringtone type</label>
+          <select id="ringtoneSelect" onchange="applySettings()">
+            <option value="beep">Beep</option>
+            <option value="soft">Soft</option>
+            <option value="alert">Alert</option>
+            <option value="bell">Bell</option>
+          </select>
+        </div>
+      </div>
+
+      <button class="test" onclick="testSound()">Test Sound</button>
+
       <div class="buttons">
         <button class="start" onclick="startBeeping()">Start</button>
         <button class="stop" onclick="stopBeeping()">Stop</button>
@@ -268,7 +384,7 @@
       </div>
 
       <div class="note">
-        Tip: On mobile, tap Start once to allow sound playback.
+        Tip: On mobile, tap Start or Test Sound once to allow audio playback.
       </div>
 
     </section>
@@ -283,8 +399,14 @@
     const timezoneLabel = document.getElementById("timezoneLabel");
     const toggleBtn = document.getElementById("toggleBtn");
 
-    const BEEP_INTERVAL_SECONDS = 57;
-    const BEEP_INTERVAL_MS = BEEP_INTERVAL_SECONDS * 1000;
+    const intervalInput = document.getElementById("intervalInput");
+    const beepCountInput = document.getElementById("beepCountInput");
+    const ringtoneSelect = document.getElementById("ringtoneSelect");
+
+    let beepIntervalSeconds = 57;
+    let beepIntervalMs = beepIntervalSeconds * 1000;
+    let beepCount = 3;
+    let ringtoneType = "beep";
 
     let running = false;
     let interval = null;
@@ -309,7 +431,6 @@
 
     function updateClock() {
       const selected = timezones[currentTimezone];
-
       const now = new Date();
 
       const time = new Intl.DateTimeFormat("en-US", {
@@ -342,33 +463,122 @@
     setInterval(updateClock, 1000);
     updateClock();
 
-    function beep3Times() {
+    function applySettings() {
+      let intervalValue = parseInt(intervalInput.value);
+      let countValue = parseInt(beepCountInput.value);
+
+      if (isNaN(intervalValue) || intervalValue < 1) {
+        intervalValue = 1;
+      }
+
+      if (intervalValue > 3600) {
+        intervalValue = 3600;
+      }
+
+      if (isNaN(countValue) || countValue < 1) {
+        countValue = 1;
+      }
+
+      if (countValue > 20) {
+        countValue = 20;
+      }
+
+      beepIntervalSeconds = intervalValue;
+      beepIntervalMs = beepIntervalSeconds * 1000;
+      beepCount = countValue;
+      ringtoneType = ringtoneSelect.value;
+
+      intervalInput.value = beepIntervalSeconds;
+      beepCountInput.value = beepCount;
+
+      if (!running) {
+        remainingEl.innerText = beepIntervalSeconds;
+      } else {
+        nextBeep = Date.now() + beepIntervalMs;
+      }
+    }
+
+    function setIntervalValue(seconds) {
+      intervalInput.value = seconds;
+      applySettings();
+    }
+
+    function getRingtoneConfig(type) {
+      if (type === "soft") {
+        return {
+          wave: "sine",
+          frequency: 620,
+          volume: 0.18,
+          duration: 0.22,
+          gap: 0.38
+        };
+      }
+
+      if (type === "alert") {
+        return {
+          wave: "square",
+          frequency: 980,
+          volume: 0.25,
+          duration: 0.2,
+          gap: 0.32
+        };
+      }
+
+      if (type === "bell") {
+        return {
+          wave: "triangle",
+          frequency: 760,
+          volume: 0.22,
+          duration: 0.35,
+          gap: 0.5
+        };
+      }
+
+      return {
+        wave: "square",
+        frequency: 850,
+        volume: 0.22,
+        duration: 0.18,
+        gap: 0.35
+      };
+    }
+
+    function playSound() {
       if (audioCtx.state === "suspended") {
         audioCtx.resume();
       }
 
-      for (let i = 0; i < 3; i++) {
+      const config = getRingtoneConfig(ringtoneType);
+
+      for (let i = 0; i < beepCount; i++) {
         const oscillator = audioCtx.createOscillator();
         const gainNode = audioCtx.createGain();
 
-        oscillator.type = "square";
-        oscillator.frequency.value = 850;
+        oscillator.type = config.wave;
+        oscillator.frequency.value = config.frequency;
 
         oscillator.connect(gainNode);
         gainNode.connect(audioCtx.destination);
 
-        const start = audioCtx.currentTime + (i * 0.35);
+        const start = audioCtx.currentTime + (i * config.gap);
 
-        gainNode.gain.setValueAtTime(0.22, start);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, start + 0.18);
+        gainNode.gain.setValueAtTime(config.volume, start);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, start + config.duration);
 
         oscillator.start(start);
-        oscillator.stop(start + 0.18);
+        oscillator.stop(start + config.duration);
       }
+    }
+
+    function testSound() {
+      applySettings();
+      playSound();
     }
 
     function startBeeping() {
       if (running) return;
+
+      applySettings();
 
       if (audioCtx.state === "suspended") {
         audioCtx.resume();
@@ -379,18 +589,17 @@
       statusEl.innerText = "Running";
       statusDot.classList.add("running");
 
-      nextBeep = Date.now() + BEEP_INTERVAL_MS;
+      nextBeep = Date.now() + beepIntervalMs;
 
       interval = setInterval(() => {
         const diff = nextBeep - Date.now();
-
         const remaining = Math.max(0, Math.ceil(diff / 1000));
 
         remainingEl.innerText = remaining;
 
         if (diff <= 0) {
-          beep3Times();
-          nextBeep += BEEP_INTERVAL_MS;
+          playSound();
+          nextBeep += beepIntervalMs;
         }
       }, 200);
     }
@@ -400,7 +609,7 @@
 
       clearInterval(interval);
 
-      remainingEl.innerText = BEEP_INTERVAL_SECONDS;
+      applySettings();
 
       statusEl.innerText = "Stopped";
       statusDot.classList.remove("running");
