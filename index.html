@@ -384,7 +384,7 @@
       </div>
 
       <div class="note">
-        Tip: On mobile, tap Start or Test Sound once to allow audio playback.
+        Tip: Keep this page open while running. Start will try to keep your phone awake.
       </div>
 
     </section>
@@ -411,6 +411,7 @@
     let running = false;
     let interval = null;
     let nextBeep = null;
+    let wakeLock = null;
 
     let currentTimezone = "IST";
 
@@ -428,6 +429,32 @@
     };
 
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    async function requestWakeLock() {
+      if (!("wakeLock" in navigator)) {
+        return;
+      }
+
+      try {
+        wakeLock = await navigator.wakeLock.request("screen");
+
+        wakeLock.addEventListener("release", () => {
+          wakeLock = null;
+        });
+      } catch (error) {
+        wakeLock = null;
+      }
+    }
+
+    async function releaseWakeLock() {
+      if (!wakeLock) {
+        return;
+      }
+
+      const lock = wakeLock;
+      wakeLock = null;
+      await lock.release();
+    }
 
     function updateClock() {
       const selected = timezones[currentTimezone];
@@ -585,6 +612,7 @@
       }
 
       running = true;
+      requestWakeLock();
 
       statusEl.innerText = "Running";
       statusDot.classList.add("running");
@@ -604,10 +632,11 @@
       }, 200);
     }
 
-    function stopBeeping() {
+    async function stopBeeping() {
       running = false;
 
       clearInterval(interval);
+      await releaseWakeLock();
 
       applySettings();
 
@@ -618,6 +647,12 @@
     document.addEventListener("click", () => {
       if (audioCtx.state === "suspended") {
         audioCtx.resume();
+      }
+    });
+
+    document.addEventListener("visibilitychange", () => {
+      if (running && document.visibilityState === "visible") {
+        requestWakeLock();
       }
     });
   </script>
